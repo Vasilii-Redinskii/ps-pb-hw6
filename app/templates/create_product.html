@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавление нового товара</title>
+</head>
+
+<body>
+    <h1>Обработан запрос с методом {{ method }}</h1>
+
+    <form action="/create_product" method="post">
+        <label>Название товара:</label>
+        <input type="text" name="title">
+        <label>Цена:</label>
+        <input type="number" name="price">
+        <button type="submit">Добавить товар</button>
+    </form>
+    
+    {% if title %}
+        <p>Название товара: {{ title }}</p>
+    {% endif %}
+    {% if price %}
+        <p>Цена: {{ price }}</p>
+    {% endif %}
+    
+    <a href="/">Вернуться на главную</a>
+</body>
+
+</html>
