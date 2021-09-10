@@ -1,10 +1,24 @@
-from app import app
+from app import app, db
+from app.models import User, Product
 from flask import render_template, request
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    
+    # Получаем все записи из таблицы Product
+    product_list = Product.query.all()
+
+    # Получаем все записи из таблицы User
+    user_list = User.query.all()
+
+    # Полученные наборы передаем в контекст
+    context = {
+        'product_list': product_list,
+        'user_list': user_list,
+    }
+
+    return render_template('index.html', **context)
 
 
 @app.route('/create_product', methods=['POST', 'GET'])
@@ -20,6 +34,12 @@ def create_product():
 
         # Получаем цену товара - это значение поля input с атрибутом name="price"
         product_price = request.form['price']
+
+        # Добавляем товар в базу данных
+        db.session.add(Product(title=product_title, price=product_price))
+
+        # сохраняем изменения в базе
+        db.session.commit()
 
         # Заполняем словарь контекста
         context = {
@@ -37,3 +57,31 @@ def create_product():
         }
 
     return render_template('create_product.html', **context)
+
+@app.route('/create_user', methods=['POST', 'GET'])
+def create_user():
+
+    context = None
+
+    if request.method == 'POST':
+        
+        name = request.form['name']
+        username = request.form['username']
+
+        db.session.add(User(name=name, username=username))
+        db.session.commit()
+
+        context = {
+            'method': 'POST',
+            'name': name,
+            'username': username,
+        }
+    
+    elif request.method == 'GET':
+
+        context = {
+            'method': 'GET',
+        }
+
+    return render_template('create_user.html', **context)
+    

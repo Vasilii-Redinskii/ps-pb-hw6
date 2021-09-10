@@ -1,6 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
+# Импортируем пакет Migrate для работы с миграциями
+from flask_migrate import Migrate
+
 
 app = Flask(__name__)
 
@@ -12,6 +15,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Создаем саму базу данных - объект db
 db = SQLAlchemy(app)
+
+# Создаем объект для работы с миграциями
+migrate = Migrate(app, db)
 
 
 from app import views
