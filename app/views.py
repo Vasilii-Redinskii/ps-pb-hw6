@@ -1,6 +1,7 @@
 from app import app, db
 from app.models import User, Product
 from flask import render_template, request
+from datetime import datetime
 
 
 @app.route('/')
@@ -36,7 +37,7 @@ def create_product():
         product_price = request.form['price']
 
         # Добавляем товар в базу данных
-        db.session.add(Product(title=product_title, price=product_price))
+        db.session.add(Product(title=product_title, price=product_price, img_url=request.form['img_url']))
 
         # сохраняем изменения в базе
         db.session.commit()
@@ -84,4 +85,65 @@ def create_user():
         }
 
     return render_template('create_user.html', **context)
+
+@app.route('/product_detail/<int:product_id>', methods=['POST', 'GET'])
+def product_detail(product_id):
+    
+    product = Product.query.get(product_id)
+
+
+    context = None
+
+
+    if request.method == 'POST':
+
+
+        new_title = request.form['new_title']
+        new_price = request.form['new_price']
+        new_img_url = request.form['new_img_url']
+
+
+        if new_title:
+            product.title = request.form['new_title']
+        
+        if new_price:
+            product.price = request.form['new_price']
+        
+        if new_img_url:
+            product.img_url = request.form['new_img_url']
+
+
+        db.session.commit()
+
+
+    age_seconds = (datetime.now() - product.created).seconds
+    age = divmod(age_seconds, 60)
+
+
+    context = {
+        'id': product.id,
+        'title': product.title,
+        'price': product.price,
+        'img_url': product.img_url,
+        'age': f'{age[0]} мин {age[1]} сек',
+    }
+
+
+    return render_template('product_detail.html', **context)    
+
+@app.route('/del_product/<int:product_id>', methods=['POST'])
+def del_product(product_id):
+    
+    product = Product.query.get(product_id)
+
+    context = {
+        'title': product.title,
+        'price': product.price,
+        'img_url': product.img_url,
+    }
+    
+    db.session.delete(product)
+    db.session.commit()
+
+    return render_template('del_product.html', **context)
     
